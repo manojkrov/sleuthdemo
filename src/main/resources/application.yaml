@@ -1,0 +1,45 @@
+spring:
+  jackson.date-format: yyyy-MM-dd HH:mm:ss
+  security:basic.enabled: false
+  profiles.active: default
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+  h2.console.enabled: true
+
+
+logging:
+  level:
+    org.springframework.web: debug
+    com.bosch.manoj.sleuth.example.demo: debug
+
+logbook:
+    exclude:
+        - /health
+        - /admin/**
+    filter.enabled: true
+    format.style: json
+    obfuscate:
+        headers:
+            - Authorization
+            - X-Secret
+        parameters:
+            - access_token
+            - password
+            - pin
+            - confirmPin
+        body:
+          - access_token
+          - refresh_token
+          - password
+          - firstName
+          - lastName
+          - email
+          - dateOfBirth
+          - pin
+          - confirmPin
+    write:
+        category: http.wire-log
+        level: debug
+        chunk-size: 0

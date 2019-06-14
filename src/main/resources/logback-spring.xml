@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+    <configuration>
+        <!-- Appender to log to file in a JSON format -->
+
+    <springProfile name="default">
+
+        <appender name="HTTP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>./http.log</file>
+            <encoder>
+                <pattern>%yellow(%d{"yyyy-MM-dd HH:mm:ss,SSSZ"}) -  %-6level - %green(trace=%X{X-B3-TraceId:-}, span=%X{X-B3-SpanId:-}), - %magenta(%msg)%n%n</pattern>
+            </encoder>
+        </appender>
+
+        <appender name="logstash" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <providers>
+                    <timestamp>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <pattern>
+                        <pattern>
+                            {
+                            "severity": "%level",
+                            "service": "${spring.application.name}",
+                            "trace": "%X{X-B3-TraceId:-}",
+                            "span": "%X{X-B3-SpanId:-}",
+                            "parent": "%X{X-B3-ParentSpanId:-}",
+                            "exportable": "%X{X-Span-Export:-}",
+                            "pid": "${PID:-}",
+                            "thread": "%thread",
+                            "class": "%logger{40}",
+                            "rest": "%message"
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <springProfile name="default">
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+                <encoder>
+                    <pattern>%yellow(%d{"yyyy-MM-dd HH:mm:ss,SSSZ"}) %highlight(%-5level) %cyan(%logger{36}.%M) trace=%X{X-B3-TraceId:-} - %magenta(%msg%n%n)</pattern>
+                </encoder>
+            </appender>
+        </springProfile>
+
+
+        <logger name="http.wire-log.full" level="debug" additivity="false">
+            <springProfile name="default">
+                <appender-ref ref="HTTP_FILE"/>
+            </springProfile>
+        </logger>
+
+        <root level="info">
+            <springProfile name="default">
+                <appender-ref ref="STDOUT"/>
+            </springProfile>
+        </root>
+    </configuration>
